@@ -1,0 +1,244 @@
+<html><head></head><body><div class="apidocDiv">
+<style>
+/*csslint
+*/
+.apidocDiv {
+    background: #fff;
+    font-family: Arial, Helvetica, sans-serif;
+}
+.apidocDiv a[href] {
+    color: #33f;
+    font-weight: bold;
+    text-decoration: none;
+}
+.apidocDiv a[href]:hover {
+    text-decoration: underline;
+}
+.apidocCodeCommentSpan {
+    background: #bbf;
+    color: #000;
+    display: block;
+}
+.apidocCodeKeywordSpan {
+    color: #d00;
+    font-weight: bold;
+}
+.apidocCodePre {
+    background: #eef;
+    border: 1px solid;
+    color: #777;
+    padding: 5px;
+    white-space: pre-wrap;
+}
+.apidocFooterDiv {
+    margin-top: 20px;
+    text-align: center;
+}
+.apidocModuleLi {
+    margin-top: 10px;
+}
+.apidocSectionDiv {
+    border-top: 1px solid;
+    margin-top: 20px;
+}
+.apidocSignatureSpan {
+    color: #777;
+    font-weight: bold;
+}
+</style>
+<h1>api documentation for
+    <a href="https://github.com/edwellbrook/node-tvdb">node-tvdb (v3.1.1)</a>
+</h1>
+<h4>Node.js library for accessing TheTVDB's API</h4>
+<div class="apidocSectionDiv"><a href="#apidoc.tableOfContents" id="apidoc.tableOfContents"><h1>table of contents</h1></a><ol>
+
+    <li class="apidocModuleLi"><a href="#apidoc.module.node-tvdb">module node-tvdb</a><ol>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.node-tvdb.node-tvdb">
+            function <span class="apidocSignatureSpan"></span>node-tvdb
+            <span class="apidocSignatureSpan">(apiKey, language)</span>
+            </a>
+
+        </li>
+
+    </ol></li>
+
+</ol></div>
+
+<div class="apidocSectionDiv">
+<h1><a href="#apidoc.module.node-tvdb" id="apidoc.module.node-tvdb">module node-tvdb</a></h1>
+
+
+    <h2>
+        <a href="#apidoc.element.node-tvdb.node-tvdb" id="apidoc.element.node-tvdb.node-tvdb">
+        function <span class="apidocSignatureSpan"></span>node-tvdb
+        <span class="apidocSignatureSpan">(apiKey, language)</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">class Client {
+
+<span class="apidocCodeCommentSpan">    /**
+     * @param {String} apiKey
+     * @param {String} [language]
+     */
+</span>
+    constructor(apiKey, language) {
+        if (!apiKey) {
+            throw new Error('API key is required');
+        }
+
+        this.apiKey = apiKey;
+        this.language = language || 'en';
+
+        // store and manage auth token
+        let tokenPromise = undefined;
+
+        this.getToken = function() {
+            if (tokenPromise === undefined) {
+                tokenPromise = logIn(this.apiKey);
+            }
+
+            return tokenPromise;
+        };
+    }
+
+    /**
+     * Get available languages useable by TheTVDB API.
+     *
+     * ``` javascript
+     * tvdb.getLanguages()
+     *     .then(response =&gt; { handle response })
+     *     .catch(error =&gt; { handle error });
+     * ```
+     *
+     * @param   {Object}  [opts] - additional options for request
+     * @returns {Promise}
+     *
+     * @see     https://api.thetvdb.com/swagger#!/Languages/get_languages
+     * @public
+     */
+
+    getLanguages(opts) {
+        return this.sendRequest('languages', opts);
+    }
+
+    /**
+     * Get episode by episode id.
+     *
+     * ``` javascript
+     * tvdb.getEpisodeById(4768125)
+     *     .then(response =&gt; { handle response })
+     *     .catch(error =&gt; { handle error });
+     * ```
+     *
+     * @param   {Number|String} episodeId
+     * @param   {Object}        [opts] - additional options for request
+     * @returns {Promise}
+     *
+     * @see     https://api.thetvdb.com/swagger#!/Episodes/get_episodes_id
+     * @public
+     */
+
+    getEpisodeById(episodeId, opts) {
+        return this.sendRequest(`episodes/${episodeId}`, opts);
+    }
+
+    /**
+     * Get all episodes by series id.
+     *
+     * ``` javascript
+     * tvdb.getEpisodesBySeriesId(153021)
+     *     .then(response =&gt; { handle response })
+     *     .catch(error =&gt; { handle error });
+     * ```
+     *
+     * @param   {Number|String} seriesId
+     * @param   {Object}        [opts] - additional options for request
+     * @returns {Promise}
+     *
+     * @see     https://api.thetvdb.com/swagger#!/Series/get_series_id_episodes
+     * @public
+     */
+
+    getEpisodesBySeriesId(seriesId, opts) {
+        return this.sendRequest(`series/${seriesId}/episodes`, opts);
+    }
+
+    /**
+     * Get basic series information by id.
+     *
+     * ``` javascript
+     * tvdb.getSeriesById(73255)
+     *     .then(response =&gt; { handle response })
+     *     .catch(error =&gt; { handle error });
+     * ```
+     *
+     * @param   {Number|String} seriesId
+     * @param   {Object}        [opts] - additional options for request
+     * @returns {Promise}
+     *
+     * @see     https://api.thetvdb.com/swagger#!/Series/get_series_id
+     * @public
+     */
+
+    getSeriesById(seriesId, opts) {
+        return this.sendRequest(`series/${seriesId}`, opts);
+    }
+
+    /**
+     * Get series episode by air date.
+     *
+     * ``` javascript
+     * tvdb.getEpisodeByAirDate(153021, '2011-10-03')
+     *     .then(response =&gt; { handle response })
+     *     .catch(error =&gt; { handle error });
+     * ```
+     *
+     * @param   {Number|String} seriesId
+     * @param   {String}        airDate
+     * @param   {Object}        [opts] - additional options for request
+     * @returns {Promise}
+     *
+     * @see     https://api.thetvdb.com/swagger#!/Series/get_series_id_episodes_query
+     * @public
+     */
+
+    getEpisodesByAirDate(seriesId, airDate, opts) {
+        return this.sendRequest(`series/${seriesId}/episodes/query?firstAired=${airDate}`, opts);
+    }
+
+    /**
+     * Get basic series information by name.
+     *
+     * ``` javascript
+     * tvdb.getSeriesByName('Breaking Bad')
+     *     .then(response =&gt; { handle response })
+     *     .catch(error =&gt; { handle error });
+     * ```
+     *
+     * @param   {String}  name
+     * @param   {Object}  [opts] - additional options for request
+     * @returns {Promise}
+     *
+     * @see     https://api.thetvdb.com/swagger#!/Search/get_search_series
+     * @public
+     */
+
+    getSeriesByName(name, opts) {
+        return this.sendRequest(`search/series?name=${name}`, ...</pre></li>
+    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    </ul>
+
+
+</div>
+
+<div class="apidocFooterDiv">
+    [ this document was created with
+    <a href="https://github.com/kaizhu256/node-utility2" target="_blank">utility2</a>
+    ]
+</div>
+</div>
+</body></html>
